@@ -31,18 +31,18 @@ exports.getFreeTimes = async ({ date, place }) => {
       let to = new Date(date + "T20:00:00.00Z");
       const freeSchedules = [];
       if (!plannings.length) {
-        freeSchedules.push([{ start, to }]);
+        freeSchedules.push([{ start, end: to }]);
       } else {
         for (let j = 0; j < plannings.length; j++) {
           const lesson = plannings[j];
           if (start < lesson.start) {
-            freeSchedules.push({ start, to: lesson.start });
+            freeSchedules.push({ start, end: lesson.start });
             start = lesson.end;
           } else {
             start = lesson.end;
           }
           if (j == plannings.length - 1 && lesson.end < to) {
-            freeSchedules.push({ start: lesson.end, to });
+            freeSchedules.push({ start: lesson.end, end: to });
           }
         }
       }
