@@ -20,7 +20,7 @@ const db = async () => {
 };
 db();
 const app = express();
-app.get("/free-rooms", async (req, res, next) => {
+app.get("/", async (req, res, next) => {
   try {
     let { place, date } = req.query;
     console.log("{ place, date }", { place, date });
