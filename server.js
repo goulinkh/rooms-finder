@@ -1,7 +1,9 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-const express = require("express");
 const Redis = require("ioredis");
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
 const rfs = require("rotating-file-stream");
 const morgan = require("morgan");
 const path = require("path");
@@ -36,25 +38,26 @@ init({ app });
 
 // ---- Requests logging ----
 if (yn(process.env.LOG)) {
-  const accessLogStream = rfs("access.log", {
-    size: "1M", // rotate daily
-    path: path.join(__dirname, "log")
-  });
+  const accessLogStream = rfs(
+    `${new Date().toISOString().replace(/T.+/gi, "")}.log`,
+    {
+      interval: "1d",
+      path: path.join(__dirname, "log")
+    }
+  );
   app.use(
     morgan(
       ":remote-addr - :method - :url - :status - :response-time ms:date[format] - :date[web] - :user-agent",
       {
-        stream: accessLogStream,
-        skip: function(_req, res) {
-          return res.statusCode !== 200;
-        }
+        stream: accessLogStream
       }
     )
   );
 }
 // Nginx proxy
 app.set("trust proxy", "loopback,uniquelocal");
-
+app.use(helmet({ xssFilter: false }));
+app.use(cors());
 app.get("/", async (req, res, next) => {
   try {
     let { place, date } = req.query;
