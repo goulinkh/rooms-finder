@@ -17,7 +17,7 @@ const toUTCDate = l =>
     ...e,
     freeSchedules: e.freeSchedules.map(dates =>
       dates.map(d => ({
-        start: console.log(d) || new Date(new Date(d.start) - 3600 * 2000),
+        start: new Date(new Date(d.start) - 3600 * 2000),
         end: new Date(new Date(d.end) - 3600 * 2000)
       }))
     )
@@ -45,16 +45,12 @@ exports.getFreeTimes = async ({ date, place }) => {
     // All buildings
     throw new Error("[custom]Il faut donner une salle ou un bâtiment");
   }
-
+  place = place.replace(/(é|è|ê)/gi, "e").replace(/(à|â)/gi, "a");
   // Priority for rooms
   const rooms = await Room.find({
     // (FSI / )(Amphi) place (...etc)
     name: {
-      $regex: new RegExp(
-        `^(.+\\/)\\s*(Amphi)?\\s*${place
-          .replace(/(é|è|ê)/gi, "e")
-          .replace(/(à|â)/gi, "a")}.*`
-      ),
+      $regex: new RegExp(`^(${place}|(.+\\/)\\s*(Amphi)?\\s*${place}.*)`),
       $options: "i"
     }
   });
