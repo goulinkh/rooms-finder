@@ -12,6 +12,16 @@ const getDate = date => {
     }
   }
 };
+const toUTCDate = l =>
+  l.map(e => ({
+    ...e,
+    freeSchedules: e.freeSchedules.map(dates =>
+      dates.map(d => ({
+        start: console.log(d) || new Date(new Date(d.start) - 3600 * 2000),
+        end: new Date(new Date(d.end) - 3600 * 2000)
+      }))
+    )
+  }));
 exports.getRooms = async ({ building }) => {
   let rooms;
   if (building) {
@@ -74,7 +84,9 @@ exports.getFreeTimes = async ({ date, place }) => {
       }
       result.push({ room: room.name, building: room.building, freeSchedules });
     }
-    return result;
+    // To UTC
+    return toUTCDate(result);
+    // return result
   } else {
     throw new Error("[custom]Salle non trouvé");
   }
