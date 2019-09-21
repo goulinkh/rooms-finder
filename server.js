@@ -2,10 +2,16 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const express = require("express");
 const Redis = require("ioredis");
-
-const { getFreeTimes } = require("./RoomController");
-const init = async () => {
+const rfs = require("rotating-file-stream");
+const morgan = require("morgan");
+const path = require("path");
+const yn = require("yn");
+const { getFreeTimes, getRooms } = require("./RoomController");
+let requests;
+const app = express();
+const init = async ({ app }) => {
   try {
+    // ---- MongoDB Login ----
     await mongoose
       .connect(process.env.DB_URL, {
         useNewUrlParser: true,
@@ -15,38 +21,88 @@ const init = async () => {
         console.log("[Database(MongoDB)] Failed to connect to the database")
       );
     console.log("Connected to the database");
-    return { redis: new Redis(process.env.REDIS_URL) };
+
+    // ---- Redis Caching ----
+    if (yn(process.env.CACHE)) {
+      requests = new Redis(process.env.REDIS_URL);
+    }
   } catch (err) {
     if (process.env.debug === "true") {
       console.log(err);
     }
   }
 };
-let requests;
-init().then(({ redis }) => (requests = redis));
-const app = express();
+init({ app });
+
+// ---- Requests logging ----
+if (yn(process.env.LOG)) {
+  const accessLogStream = rfs("access.log", {
+    size: "1M", // rotate daily
+    path: path.join(__dirname, "log")
+  });
+  app.use(
+    morgan(
+      ":remote-addr - :method - :url - :status - :response-time ms:date[format] - :date[web] - :user-agent",
+      {
+        stream: accessLogStream,
+        skip: function(_req, res) {
+          return res.statusCode !== 200;
+        }
+      }
+    )
+  );
+}
+// Nginx proxy
+app.set("trust proxy", "loopback,uniquelocal");
+
 app.get("/", async (req, res, next) => {
   try {
     let { place, date } = req.query;
     const query = { place, date };
-    const response = await requests.get(JSON.stringify(query));
-    if (response) {
-      res.json(JSON.parse(response));
+
+    if (requests) {
+      let response;
+      response = await requests.get(JSON.stringify(query));
+      if (response) {
+        res.json(JSON.parse(response));
+      } else {
+        const resp = await getFreeTimes({ date, place });
+        requests.set(
+          JSON.stringify(query),
+          JSON.stringify(resp),
+          "ex",
+          60 * 60
+        ); // ex: expiration in seconds
+        res.json(resp);
+      }
     } else {
-      const resp = await getFreeTimes({ date, place });
-      requests.set(JSON.stringify(query), JSON.stringify(resp));
-      res.json(resp);
+      res.json(await getFreeTimes({ date, place }));
     }
   } catch (err) {
     next(err);
   }
 });
+const buildings = require("./buildings");
+app.get("/buildings", async (_req, res) => {
+  res.json(buildings);
+});
+app.get("/rooms", async (req, res, next) => {
+  try {
+    const { building } = req.query;
+    res.json(await getRooms({ building }));
+  } catch (err) {
+    next(err);
+  }
+});
+// Errors Handler
 app.use((err, _req, res, _next) => {
   if (err && !res.headersSent) {
     if (err.message && err.message.match(/^\[custom\]/gi)) {
-      res.status(404).send(err.message.replace(/^\[custom\]/gi, ""));
+      res
+        .status(404)
+        .json({ message: err.message.replace(/^\[custom\]/gi, "") });
     } else {
-      res.status(404).send("Requête invalide");
+      res.status(404).send({ message: "Requête invalide" });
     }
   }
 });

@@ -12,17 +12,43 @@ const getDate = date => {
     }
   }
 };
+exports.getRooms = async ({ building }) => {
+  let rooms;
+  if (building) {
+    rooms = await Room.find({
+      building: {
+        $regex: new RegExp(`^${building}$`),
+        $options: "i"
+      }
+    });
+  } else {
+    rooms = await Room.find({});
+  }
+  return (rooms || []).map(r => ({
+    name: r.name,
+    building: r.building
+  }));
+};
 exports.getFreeTimes = async ({ date, place }) => {
   date = getDate(date);
   if (!place) {
     // All buildings
-    throw new Error("[custom]Il faut donner une salle");
+    throw new Error("[custom]Il faut donner une salle ou un bâtiment");
   }
+
   // Priority for rooms
   const rooms = await Room.find({
-    name: { $regex: new RegExp(`^(.+\\/)\\s*${place}.*`), $options: "i" }
+    // (FSI / )(Amphi) place (...etc)
+    name: {
+      $regex: new RegExp(
+        `^(.+\\/)\\s*(Amphi)?\\s*${place
+          .replace(/(é|è|ê)/gi, "e")
+          .replace(/(à|â)/gi, "a")}.*`
+      ),
+      $options: "i"
+    }
   });
-  if (rooms) {
+  if (rooms && rooms.length) {
     const result = [];
     for (let i = 0; i < rooms.length; i++) {
       const room = rooms[i];
@@ -49,8 +75,9 @@ exports.getFreeTimes = async ({ date, place }) => {
       result.push({ room: room.name, building: room.building, freeSchedules });
     }
     return result;
+  } else {
+    throw new Error("[custom]Salle non trouvé");
   }
-  return null;
 };
 const getPlanning = async ({ date, room }) => {
   const req = new URLSearchParams();

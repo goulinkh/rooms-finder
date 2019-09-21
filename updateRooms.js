@@ -3,38 +3,7 @@ const mongoose = require("mongoose");
 const fetch = require("node-fetch");
 
 const getRooms = async () => {
-  let buildingsList = [
-    {
-      name: "3A"
-    },
-    {
-      name: "U4"
-    },
-    {
-      name: "U2"
-    },
-    {
-      name: "U3"
-    },
-    {
-      name: "U1"
-    },
-    {
-      name: "3TP2"
-    },
-    {
-      name: "1A"
-    },
-    {
-      name: "2A"
-    },
-    {
-      name: "4A"
-    },
-    {
-      name: "1R3"
-    }
-  ];
+  let buildingsList = require("./buildings");
   // Fetch Rooms list from the API
   for (let i = 0; i < buildingsList.length; i++) {
     const building = buildingsList[i];
@@ -63,7 +32,7 @@ const db = async () => {
     });
     console.log("Connected to the database");
   } catch (err) {
-    console.log("[Database(MongoDB)] Failed to connect to the datase");
+    console.log("[Database(MongoDB)] Failed to connect to the database");
     if (process.env.debug === "true") {
       console.log(err);
     }
