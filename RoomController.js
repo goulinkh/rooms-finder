@@ -15,12 +15,10 @@ const getDate = date => {
 const toUTCDate = l =>
   l.map(e => ({
     ...e,
-    freeSchedules: e.freeSchedules.map(dates =>
-      dates.map(d => ({
-        start: new Date(new Date(d.start) - 3600 * 2000),
-        end: new Date(new Date(d.end) - 3600 * 2000)
-      }))
-    )
+    freeSchedules: e.freeSchedules.map(d => ({
+      start: new Date(new Date(d.start) - 3600 * 2000),
+      end: new Date(new Date(d.end) - 3600 * 2000)
+    }))
   }));
 exports.getRooms = async ({ building }) => {
   let rooms;
@@ -45,17 +43,21 @@ exports.getFreeTimes = async ({ date, place }) => {
     // All buildings
     throw new Error("[custom]Il faut donner une salle ou un bâtiment");
   }
-  place = place.replace(/(é|è|ê)/gi, "e").replace(/(à|â)/gi, "a");
+  // place = place.replace(/(é|è|ê)/gi, "e").replace(/(à|â)/gi, "a");
   // Priority for rooms
-  const rooms = await Room.find({
-    // (FSI / )(Amphi) place (...etc)
-    name: {
-      $regex: new RegExp(`^(${place}|(.+\\/)\\s*(Amphi)?\\s*${place}.*)`),
-      $options: "i"
-    }
-  });
+  let rooms = await Room.find({ name: place });
+  if (!rooms.length) {
+    rooms = await Room.find({
+      // (FSI / )(Amphi) place (...etc)
+      name: {
+        $regex: new RegExp(`(${place}|^(.+\\/)\\s*(Amphi)?\\s*${place}.*)`),
+        $options: "i"
+      }
+    });
+  }
   if (rooms && rooms.length) {
     const result = [];
+
     for (let i = 0; i < rooms.length; i++) {
       const room = rooms[i];
       const plannings = await getPlanning({ date, room: room.name });
@@ -63,7 +65,7 @@ exports.getFreeTimes = async ({ date, place }) => {
       let to = new Date(date + "T20:00:00.00Z");
       const freeSchedules = [];
       if (!plannings.length) {
-        freeSchedules.push([{ start, end: to }]);
+        freeSchedules.push({ start, end: to });
       } else {
         for (let j = 0; j < plannings.length; j++) {
           const lesson = plannings[j];
@@ -82,7 +84,6 @@ exports.getFreeTimes = async ({ date, place }) => {
     }
     // To UTC
     return toUTCDate(result);
-    // return result
   } else {
     throw new Error("[custom]Salle non trouvé");
   }
