@@ -50,6 +50,11 @@ const updateRooms = async () => {
       await new Room({ name, building: b.name }).save();
     }
   }
+  // Get local rooms
+  const rooms = require("./rooms");
+  for (let i = 0; i < rooms.length; i++) {
+    await new Room(rooms[i]).save();
+  }
   console.log("Rooms updated successfully");
   return bs;
 };
