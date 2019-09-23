@@ -1,6 +1,27 @@
 [
   {
+    "name": "FSI / Amphi TURING (U4-A3)",
+    "building": "U4"
+  },
+  {
+    "name": "FSI / Amphi BAILLAUD (U4-A4)",
+    "building": "U4"
+  },
+  {
+    "name": "FSI / Amphi FERMAT  (bat.1A)",
+    "building": "1A"
+  },
+
+  {
     "name": "FSI / Amphi BOREL (U2-A1)",
+    "building": "U2"
+  },
+  {
+    "name": "FSI / Amphi FRENET (U2-A3)",
+    "building": "U2"
+  },
+  {
+    "name": "FSI / Amphi VANDEL (U2-A4)",
     "building": "U2"
   },
   {
