@@ -83,8 +83,7 @@ exports.getFreeTimes = async ({ date, place }) => {
       result.push({ room: room.name, building: room.building, freeSchedules });
     }
     // To UTC
-    // return toUTCDate(result);
-    return result;
+    return toUTCDate(result);
   } else {
     throw new Error("[custom]Salle non trouvé");
   }
