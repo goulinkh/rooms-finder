@@ -16,8 +16,8 @@ const toUTCDate = l =>
   l.map(e => ({
     ...e,
     freeSchedules: e.freeSchedules.map(d => ({
-      start: new Date(new Date(d.start) - 2 * 3600 * 1000),
-      end: new Date(new Date(d.end) - 2 * 3600 * 1000)
+      start: new Date(new Date(d.start) - 4 * 3600 * 1000),
+      end: new Date(new Date(d.end) - 4 * 3600 * 1000)
     }))
   }));
 exports.getRooms = async ({ building }) => {
@@ -61,8 +61,8 @@ exports.getFreeTimes = async ({ date, place }) => {
     for (let i = 0; i < rooms.length; i++) {
       const room = rooms[i];
       const plannings = await getPlanning({ date, room: room.name });
-      let start = new Date(date + "T07:45:00.00Z");
-      let to = new Date(date + "T20:00:00.00Z");
+      let start = new Date(date + "T09:45:00.00Z");
+      let to = new Date(date + "T22:00:00.00Z");
       const freeSchedules = [];
       if (!plannings.length) {
         freeSchedules.push({ start, end: to });
