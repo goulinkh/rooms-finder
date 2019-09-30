@@ -16,8 +16,8 @@ const toUTCDate = l =>
   l.map(e => ({
     ...e,
     freeSchedules: e.freeSchedules.map(d => ({
-      start: new Date(new Date(d.start) - 3600 * 2000),
-      end: new Date(new Date(d.end) - 3600 * 2000)
+      start: new Date(new Date(d.start) - 2 * 3600 * 1000),
+      end: new Date(new Date(d.end) - 2 * 3600 * 1000)
     }))
   }));
 exports.getRooms = async ({ building }) => {
@@ -83,7 +83,8 @@ exports.getFreeTimes = async ({ date, place }) => {
       result.push({ room: room.name, building: room.building, freeSchedules });
     }
     // To UTC
-    return toUTCDate(result);
+    // return toUTCDate(result);
+    return result;
   } else {
     throw new Error("[custom]Salle non trouvé");
   }
@@ -115,13 +116,17 @@ const getPlanning = async ({ date, room }) => {
   )).json();
   for (let i = 0; i < plannings.length; i++) {
     const lesson = plannings[i];
-    plannings[i] = {
-      start: new Date(lesson.start + ".00Z"),
-      end: new Date(lesson.end + ".00Z"),
-      room: lesson.description
-        .match(/^.+(\r|\n|<.+\/>)/gi)[0]
-        .replace(/(\r|\n|<.+\/>)$/gi, "")
-    };
+    if (lesson.start && lesson.end) {
+      plannings[i] = {
+        start: new Date(lesson.start + ".00Z"),
+        end: new Date(lesson.end + ".00Z"),
+        room: lesson.description
+          .match(/^.+(\r|\n|<.+\/>)/gi)[0]
+          .replace(/(\r|\n|<.+\/>)$/gi, "")
+      };
+    } else {
+      plannings.splice(i);
+    }
   }
   // sort by date
   plannings = plannings.sort((e1, e2) => e1.start > e2.start);
