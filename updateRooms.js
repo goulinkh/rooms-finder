@@ -9,7 +9,7 @@ const getRooms = async () => {
     const building = buildingsList[i];
 
     building.rooms = await (await fetch(
-      `https://edt.univ-tlse3.fr/calendar2/Home/ReadResourceListItems?myResources=false&searchTerm=${building.name}&pageSize=100&pageNumber=1&resType=102`
+      `https://edt.univ-tlse3.fr/calendar2/Home/ReadResourceListItems?myResources=false&searchTerm=${building.name}-&pageSize=100&pageNumber=1&resType=102`
     )).json();
 
     // Some filtring
