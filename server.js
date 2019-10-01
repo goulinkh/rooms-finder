@@ -99,6 +99,9 @@ app.get("/rooms", async (req, res, next) => {
 });
 // Errors Handler
 app.use((err, _req, res, _next) => {
+  if (yn(process.env.debug)) {
+    console.log(err);
+  }
   if (err && !res.headersSent) {
     if (err.message && err.message.match(/^\[custom\]/gi)) {
       res

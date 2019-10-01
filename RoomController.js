@@ -4,12 +4,14 @@ const { URLSearchParams } = require("url");
 const getDate = date => {
   if (!date) {
     return new Date().toISOString().replace(/T.+/gi, "");
-  } else {
+  } else if (typeof date == "string") {
     if (date.match(/\d{4}(-\d{2}){2}/gi)) {
       return date;
     } else {
       return new Date(date).toISOString().replace(/T.+/gi, "");
     }
+  } else {
+    return date.toISOString().replace(/T.+/gi, "");
   }
 };
 const toUTCDate = l =>
@@ -92,7 +94,7 @@ const getPlanning = async ({ date, room }) => {
   const req = new URLSearchParams();
   const params = {
     start: date,
-    end: date,
+    end: getDate(addDay(new Date(date), 1)),
     resType: "102",
     calView: "agendaDay",
     "federationIds[]": room,
@@ -129,5 +131,11 @@ const getPlanning = async ({ date, room }) => {
   }
   // sort by date
   plannings = plannings.sort((e1, e2) => e1.start > e2.start);
-  return plannings;
+  return plannings.filter(
+    e => getDate(e.start) === date || getDate(e.end) === date
+  );
+};
+const addDay = function(date, days) {
+  date.setDate(date.getDate() + days);
+  return date;
 };
