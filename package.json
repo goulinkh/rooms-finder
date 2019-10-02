@@ -1,0 +1,33 @@
+{
+  "name": "rooms_finder",
+  "version": "2.0.0",
+  "description": "Find free class rooms in the University of Toulouse 3",
+  "main": "server.js",
+  "scripts": {
+    "test": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goulinkh/rooms-finder.git"
+  },
+  "author": "Goulin Khoge",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/goulinkh/rooms-finder/issues"
+  },
+  "homepage": "https://github.com/goulinkh/rooms-finder#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "helmet": "^3.21.1",
+    "mongoose": "^5.7.3",
+    "node-fetch": "^2.6.0",
+    "yn": "^3.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "nodemon": "^1.19.3"
+  }
+}
