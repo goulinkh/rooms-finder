@@ -1,0 +1,9 @@
+[
+  { "id": "FSI / BU", "text": "BU (FSI / BU)", "dept": "FSI mutualisé" },
+  { "id": "FSI / INSA", "text": "INSA (FSI / INSA)", "dept": "FSI mutualisé" },
+  {
+    "id": "FSI / IRSAMC",
+    "text": "IRSAMC (FSI / IRSAMC)",
+    "dept": "FSI mutualisé"
+  }
+]
