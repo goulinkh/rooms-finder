@@ -19,6 +19,7 @@ async function updateRooms() {
       try {
         await new Room({
           name: room.text,
+          slug: room.id,
           departement: room.dept,
           building: room.building
         }).save();
