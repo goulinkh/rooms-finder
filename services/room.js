@@ -79,5 +79,18 @@ async function getRooms(query, pageNumber) {
     return null;
   }
 }
+async function searchRooms(query) {
+  let rooms = await Room.find({
+    // (FSI / )(Amphi) query (...etc)
+    name: {
+      $regex: new RegExp(`(${query}|^(.+\\/)\\s*(Amphi)?\\s*${query}.*)`),
+      $options: "i"
+    }
+  });
+  if (!rooms.length) {
+    rooms = await Room.find({ name: query });
+  }
+  return rooms;
+}
 
-module.exports = { updateRooms };
+module.exports = { updateRooms, searchRooms };
