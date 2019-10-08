@@ -37,11 +37,14 @@ router.get("/buildings", (_req, res, next) => {
     next(e);
   }
 });
-router.get("/rooms/:building", async (req, res, next) => {
+const getRooms = async (req, res, next) => {
   try {
-    const { building } = req.params;
+    let { building } = req.params;
+    if (!building) building = req.query.building;
     res.json(await getRoomsByBuilding(building));
   } catch (e) {
     next(e);
   }
-});
+};
+router.get("/rooms/:building", getRooms);
+router.get("/rooms", getRooms);
