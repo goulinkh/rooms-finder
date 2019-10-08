@@ -32,7 +32,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/buildings", (_req, res, next) => {
   try {
-    res.json(buildings);
+    res.json(buildings.map(b => ({ name: b })));
   } catch (e) {
     next(e);
   }

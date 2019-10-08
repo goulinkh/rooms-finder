@@ -88,15 +88,19 @@ async function searchRooms(query) {
     }
   });
   if (!rooms.length) {
+    rooms = await Room.find({ slug: query });
+  }
+  if (!rooms.length) {
     rooms = await Room.find({ name: query });
   }
   return rooms;
 }
 async function getRoomsByBuilding(building) {
   try {
-    return (await Room.find({ building: building.toUpperCase() })).map(
-      e => e.name
-    );
+    return (await Room.find({ building: building.toUpperCase() })).map(e => ({
+      name: e.name,
+      building: e.building
+    }));
   } catch (e) {
     if (yn(process.env.DEGUB)) {
       console.log(e);

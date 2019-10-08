@@ -72,6 +72,9 @@ async function getPlannings(rooms, start, end, building = null) {
  */
 async function getAllPlannings() {
   const rooms = await Room.find({});
+  if (yn(process.env.LOG)) {
+    console.log("\tStarted plannings fetching for", rooms.length, "Rooms");
+  }
   const plannings = [];
   const months = getMonths(process.env.START, process.env.END);
   for (let i = 0; i < months.length - 1; i++) {
