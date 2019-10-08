@@ -149,7 +149,6 @@ async function getFreePlanningsOneRoom(room, date) {
     return [{ start, end }];
   }
   plannings = plannings.sort((e1, e2) => e1.start > e2.start);
-  console.log("plannings", plannings);
   const freePlannings = [];
   for (const planning of plannings) {
     if (planning.start <= start) {

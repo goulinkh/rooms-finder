@@ -5,7 +5,7 @@
 - [x] Parse `start & end` attr from `CELACT API` with `new Date(moment.tz(date,'Europe/Paris').format())`
 - [ ] add Room service `fetch` `try/catch` error debug log.
 - [ ] add Planning service `try/catch` error debug log.
-- [ ] Routes for :
+- [x] Routes for :
   - `/`: main entry.
   - `/buildings`: Buildings list.
-  - `/rooms`: Get rooms for given buiding or all rooms.
+  - `/rooms/:building`: Get rooms for given buiding or all rooms.

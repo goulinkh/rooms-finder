@@ -92,5 +92,15 @@ async function searchRooms(query) {
   }
   return rooms;
 }
-
-module.exports = { updateRooms, searchRooms };
+async function getRoomsByBuilding(building) {
+  try {
+    return (await Room.find({ building: building.toUpperCase() })).map(
+      e => e.name
+    );
+  } catch (e) {
+    if (yn(process.env.DEGUB)) {
+      console.log(e);
+    }
+  }
+}
+module.exports = { updateRooms, searchRooms, getRoomsByBuilding };
