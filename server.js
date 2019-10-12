@@ -2,22 +2,20 @@ require("dotenv").config();
 
 const express = require("express");
 const yn = require("yn");
+const schedule = require("node-schedule");
 
 const { connect: connectToDb } = require("./db");
 const { router } = require("./routes");
-const { updateRooms, searchRooms } = require("./services/room");
-const { updateAllplannings, getFreePlannings } = require("./services/planning");
 const { post, pre } = require("./middlewares");
+const updater = require("./updater");
 (async () => {
   try {
     // Bootstrap
     await connectToDb();
 
-    // TODO: cron daily
-    // await updateRooms();
-    // console.log(
-    //   await getFreePlannings(await searchRooms("u3-01"), "2019-10-07")
-    // );
+    schedule.scheduleJob("0 */2 * * *", async function() {
+      await updater();
+    });
 
     // Server startup
     const app = express();

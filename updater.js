@@ -5,8 +5,8 @@ const yn = require("yn");
 const { connect: connectToDb } = require("./db");
 const { updateRooms } = require("./services/room");
 const { updateAllplannings } = require("./services/planning");
-const { post, pre } = require("./middlewares");
-(async () => {
+
+exports = async () => {
   try {
     // Bootstrap
     await connectToDb();
@@ -23,4 +23,4 @@ const { post, pre } = require("./middlewares");
       console.log(e);
     }
   }
-})();
+};
