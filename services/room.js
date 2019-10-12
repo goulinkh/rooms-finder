@@ -51,6 +51,7 @@ function recognizeRoom(room) {
   });
   return {
     ...room,
+    text: room.text.replace(/\(.*\)\s*$/gi, "").trim(),
     building: guesses[0]
   };
 }
