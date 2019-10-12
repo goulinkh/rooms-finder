@@ -3,8 +3,8 @@ require("dotenv").config();
 const yn = require("yn");
 
 const { connect: connectToDb } = require("./db");
-const { updateRooms, searchRooms } = require("./services/room");
-const { updateAllplannings, getFreePlannings } = require("./services/planning");
+const { updateRooms } = require("./services/room");
+const { updateAllplannings } = require("./services/planning");
 const { post, pre } = require("./middlewares");
 (async () => {
   try {
