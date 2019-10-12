@@ -12,7 +12,9 @@ const updater = require("./updater");
   try {
     // Bootstrap
     await connectToDb();
-
+    if (yn(process.env.LOG)) {
+      console.log(`[${new Date().toLocaleString()}] Updating the database.`);
+    }
     schedule.scheduleJob("0 */2 * * *", async function() {
       await updater();
     });
