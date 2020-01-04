@@ -1,7 +1,6 @@
 const fetch = require("node-fetch");
 const yn = require("yn");
 const moment = require("moment-timezone");
-const { writeFileSync } = require("fs");
 const path = require("path");
 const { Room, Planning } = require("../models");
 
@@ -37,27 +36,15 @@ async function getPlannings(rooms, start, end, building = null) {
         req.append(p, params[p]);
       }
     }
-    let plannings = await (await fetch(
-      "https://edt.univ-tlse3.fr/calendar2/Home/GetCalendarData",
-      {
+    let plannings = await (
+      await fetch("https://edt.univ-tlse3.fr/calendar2/Home/GetCalendarData", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
         },
         body: req.toString()
-      }
-    )).json();
-    if (yn(process.env.LOG)) {
-      console.log(
-        `[${new Date().toISOString()}] Plannings fetching is done ${
-          building ? "for " + building : ""
-        }`
-      );
-    }
-    writeFileSync(
-      path.join(__dirname, "..", "temp.json"),
-      JSON.stringify(plannings)
-    );
+      })
+    ).json();
     return plannings;
   } catch (e) {
     if (yn(process.env.DEBUG)) {
@@ -80,7 +67,13 @@ async function getAllPlannings() {
   for (let i = 0; i < months.length - 1; i++) {
     const start = months[i];
     const end = months[i + 1];
-    plannings.push(...(await getPlannings(rooms.map(r => r.slug), start, end)));
+    plannings.push(
+      ...(await getPlannings(
+        rooms.map(r => r.slug),
+        start,
+        end
+      ))
+    );
   }
 
   return plannings;
@@ -96,7 +89,8 @@ function parsePlanning({ start, end, description }) {
   description = description.match(/^.+(\r|\n|\t)/gi);
   if (!(description && description.length)) return null;
   description = description[0].replace(/(\r|\n|\t)$/, "");
-  return { start, end, roomSlug: description };
+  const rooms = description.split(",").map(e => e.trim());
+  return rooms.map(roomSlug => ({ start, end, roomSlug }));
 }
 
 async function updateAllplannings() {
@@ -106,9 +100,13 @@ async function updateAllplannings() {
   await Planning.deleteMany({});
   const plannings = await getAllPlannings();
   for (let planning of plannings) {
-    planning = parsePlanning(planning);
-    if (planning) {
-      new Planning(planning).save();
+    const plannings = parsePlanning(planning);
+    if (plannings && plannings.length) {
+      await Promise.all(
+        plannings.map(planning => {
+          new Planning(planning).save();
+        })
+      );
     }
   }
   if (yn(process.env.LOG)) {
@@ -130,6 +128,7 @@ function getMonths(start, end) {
   }
   return months;
 }
+
 /**
  * Trouver les horraires libre pour chaque salle donnée
  * @param {String} room
