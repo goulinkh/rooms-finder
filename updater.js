@@ -6,7 +6,7 @@ const { connect: connectToDb } = require("./db");
 const { updateRooms } = require("./services/room");
 const { updateAllplannings } = require("./services/planning");
 
-exports = async () => {
+const updater = async () => {
   try {
     // Bootstrap
     await connectToDb();
@@ -18,9 +18,11 @@ exports = async () => {
     //   await getFreePlannings(await searchRooms("u3-01"), "2019-10-07")
     // );
   } catch (e) {
-    console.log("Update failure");
+    console.log("Update  failure");
     if (yn(process.env.DEBUG)) {
       console.log(e);
     }
   }
 };
+module.exports = updater;
+updater();
