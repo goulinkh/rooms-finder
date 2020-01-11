@@ -96,9 +96,6 @@ function parsePlanning({ start, end, description }) {
   description = description.match(/.+/gi)[0];
   if (!(description && description.length)) return null;
   const rooms = description.split(",").map(e => entites.decode(e.trim()));
-  rooms.forEach(e => {
-    if (e.match(/shannon/gi)) console.log(e);
-  });
   return rooms.map(roomSlug => ({ start, end, roomSlug }));
 }
 
