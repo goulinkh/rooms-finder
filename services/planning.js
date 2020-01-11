@@ -1,8 +1,12 @@
 const fetch = require("node-fetch");
 const yn = require("yn");
 const moment = require("moment-timezone");
+const entites = new require("html-entities").XmlEntities;
 const { Room, Planning } = require("../models");
 
+function logger(message) {
+  console.log(`[${new Date().toISOString()}] ${message}`);
+}
 // TODO: Doc start format
 async function getPlannings(rooms, start, end, building = null) {
   if (!(checkDateFormat(start) || checkDateFormat(end))) {
@@ -11,8 +15,8 @@ async function getPlannings(rooms, start, end, building = null) {
     );
   }
   if (yn(process.env.LOG)) {
-    console.log(
-      `[${new Date().toISOString()}] Starting plannings fetch ${
+    logger(
+      `Starting plannings fetch ${
         building ? "for " + building : ""
       }from ${start} to ${end}`
     );
@@ -59,7 +63,7 @@ async function getPlannings(rooms, start, end, building = null) {
 async function getAllPlannings() {
   const rooms = await Room.find({});
   if (yn(process.env.LOG)) {
-    console.log("\tStarted plannings fetching for", rooms.length, "Rooms");
+    logger("Started plannings fetching for", rooms.length, "Rooms");
   }
   const plannings = [];
   const months = getMonths(process.env.START, process.env.END);
@@ -91,13 +95,16 @@ function parsePlanning({ start, end, description }) {
   end = new Date(moment.tz(end, "Europe/Paris").format());
   description = description.match(/.+/gi)[0];
   if (!(description && description.length)) return null;
-  const rooms = description.split(",").map(e => e.trim());
+  const rooms = description.split(",").map(e => entites.decode(e.trim()));
+  rooms.forEach(e => {
+    if (e.match(/shannon/gi)) console.log(e);
+  });
   return rooms.map(roomSlug => ({ start, end, roomSlug }));
 }
 
 async function updateAllplannings() {
   if (yn(process.env.LOG)) {
-    console.log(`[${new Date().toISOString()}] Update all plannings started`);
+    logger(`Update all plannings started`);
   }
   await Planning.deleteMany({});
   const plannings = await getAllPlannings();
@@ -112,9 +119,7 @@ async function updateAllplannings() {
     }
   }
   if (yn(process.env.LOG)) {
-    console.log(
-      `[${new Date().toISOString()}] Update all plannings is done succesfully`
-    );
+    logger(`Update all plannings is done succesfully`);
   }
 }
 function checkDateFormat(date) {
