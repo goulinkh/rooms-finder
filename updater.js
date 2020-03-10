@@ -25,4 +25,4 @@ const updater = async () => {
   }
 };
 module.exports = updater;
-updater();
+updater()

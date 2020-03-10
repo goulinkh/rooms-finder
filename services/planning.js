@@ -144,13 +144,15 @@ async function getFreePlanningsOneRoom(room, date) {
   date = moment(date).format("YYYY-MM-DD");
   let start = new Date(moment.tz(date + " 07:45:00", "Europe/Paris").format());
   let end = new Date(moment.tz(date + " 20:00:00", "Europe/Paris").format());
+  const day = new Date(moment.tz(date, "Europe/Paris").format())
   let plannings = await Planning.find({
     roomSlug: room,
-    start: { $gte: start },
+    start: { $gte: day },
     end: {
-      $lte: new Date(moment.tz(date + " 24:00:00", "Europe/Paris").format())
+      $lte: new Date(day.getTime()+24*3600*1000)
     }
   });
+
   if (!(plannings && plannings.length)) {
     return [{ start, end }];
   }

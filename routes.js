@@ -1,11 +1,10 @@
 const router = (exports.router = require("express").Router());
 
 const {
-  updateRooms,
   searchRooms,
   getRoomsByBuilding
 } = require("./services/room");
-const { updateAllplannings, getFreePlannings } = require("./services/planning");
+const { getFreePlannings } = require("./services/planning");
 
 const buildings = require("./static/buildings");
 
