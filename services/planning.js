@@ -142,9 +142,9 @@ function getMonths(start, end) {
 async function getFreePlanningsOneRoom(room, date) {
   // date == undefined => now
   date = moment(date).format("YYYY-MM-DD");
-  let start = new Date(moment.tz(date + " 07:45:00", "Europe/Paris").format());
-  let end = new Date(moment.tz(date + " 20:00:00", "Europe/Paris").format());
-  const day = new Date(moment.tz(date, "Europe/Paris").format())
+  let start = moment.tz(date + " 07:45:00", "Europe/Paris").utc().toDate();
+  let end = moment.tz(date + " 20:00:00", "Europe/Paris").utc().toDate();
+  const day = moment.tz(date, "Europe/Paris").utc().toDate()
   let plannings = await Planning.find({
     roomSlug: room,
     start: { $gte: day },
