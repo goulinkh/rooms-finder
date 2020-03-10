@@ -152,7 +152,7 @@ async function getFreePlanningsOneRoom(room, date) {
       $lte: new Date(day.getTime()+24*3600*1000)
     }
   });
-  console.log('plannings', plannings)
+
   if (!(plannings && plannings.length)) {
     return [{ start, end }];
   }
