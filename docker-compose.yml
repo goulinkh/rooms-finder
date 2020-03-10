@@ -2,6 +2,7 @@ version: "3"
 services:
     rooms-finder-api:
         build: .
+        container_name: rooms-finder.api
         restart: always
         command: yarn start
         volumes: 
@@ -15,6 +16,7 @@ services:
             - mongo-db:mongodb
     mongo-db:
         image: mongo
+        container_name: rooms-finder.db
         restart: always
         volumes: 
             - db-data:/data/db
