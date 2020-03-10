@@ -1,7 +1,6 @@
 require("dotenv").config();
 
 const yn = require("yn");
-
 const { connect: connectToDb } = require("./db");
 const { updateRooms } = require("./services/room");
 const { updateAllplannings } = require("./services/planning");

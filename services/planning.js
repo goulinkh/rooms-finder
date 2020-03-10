@@ -110,7 +110,7 @@ async function updateAllplannings() {
     if (plannings && plannings.length) {
       await Promise.all(
         plannings.map(planning => {
-          new Planning(planning).save();
+          return (new Planning(planning)).save();
         })
       );
     }
@@ -144,7 +144,7 @@ async function getFreePlanningsOneRoom(room, date) {
   date = moment(date).format("YYYY-MM-DD");
   let start = moment.tz(date + " 07:45:00", "Europe/Paris").utc().toDate();
   let end = moment.tz(date + " 20:00:00", "Europe/Paris").utc().toDate();
-  const day = moment.tz(date, "Europe/Paris").utc().toDate()
+  const day = moment.utc(date).toDate()
   let plannings = await Planning.find({
     roomSlug: room,
     start: { $gte: day },
@@ -156,7 +156,7 @@ async function getFreePlanningsOneRoom(room, date) {
   if (!(plannings && plannings.length)) {
     return [{ start, end }];
   }
-  plannings = plannings.sort((e1, e2) => e1.start > e2.start);
+  plannings = plannings.sort((e1, e2) => e1.start - e2.start);
   const freePlannings = [];
   for (const planning of plannings) {
     if (planning.start <= start) {
