@@ -1,0 +1,26 @@
+version: "3"
+services:
+  backend:
+    image: node:12-alpine
+    container_name: rooms-finder.api
+    restart: always
+    volumes:
+      - .:/usr/backend
+    tty: true
+    working_dir: /usr/backend
+    ports:
+      - 2002:8080
+    depends_on:
+      - mongodb
+    env_file: 
+      - .env
+  mongodb:
+    image: mongo
+    container_name: rooms-finder.db
+    restart: always
+    volumes:
+      - db-data:/data/db
+    ports:
+      - "27017-27019:27017-27019"
+volumes:
+  db-data:

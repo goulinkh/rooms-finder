@@ -1,29 +1,5 @@
 version: "3"
 services:
-    rooms-finder-api:
-        build: .
-        container_name: rooms-finder.api
-        restart: always
-        command: yarn start
-        volumes: 
-            - .:/usr/app
-            - /usr/app/node_modules
-        environment:
-            - DB=mongodb://mongodb:27017/rooms-project
-        ports:
-            - 2002:8080
-        links: 
-            - mongo-db:mongodb
-    mongo-db:
-        image: mongo
-        container_name: rooms-finder.db
-        restart: always
-        volumes: 
-            - db-data:/data/db
-        ports:
-            - '27017-27019:27017-27019'
-volumes: 
-    db-data:
-
-            
-            
+  backend:
+    command: /bin/sh -c "yarn && yarn start:dev"
+  mongodb:

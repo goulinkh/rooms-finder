@@ -1,0 +1,5 @@
+version: "3"
+services:
+  backend:
+    command: /bin/sh -c "yarn && yarn start:prod"
+  mongodb:
