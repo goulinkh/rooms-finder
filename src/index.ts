@@ -24,7 +24,8 @@ async function bootstrap() {
   // update plannings cron
   schedule.scheduleJob("0 */2 * * *", async () => {
     try {
-      logger.log(`plannings update started`, "Cron");
+      logger.log(`rooms and plannings update started`, "Cron");
+      await roomsService.updateRooms();
       await planningService.updateAllPlannings();
     } catch (e) {
       logger.error(`Failed to update all plannings ${e}`, "Cron");

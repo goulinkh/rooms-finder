@@ -4,7 +4,7 @@
   "author": "Goulin Khoge",
   "license": "Apache-2.0",
   "description": "Find free class rooms in the University of Toulouse 3",
-  "main": "server.js",
+  "main": "src/index.ts",
   "scripts": {
     "start:prod": "rm -rf dist && tsc -p . && node dist/index.js",
     "start:dev": "tsnd --respawn --clear src/index.ts"

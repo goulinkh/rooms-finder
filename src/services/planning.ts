@@ -115,7 +115,7 @@ export class PlanningService {
 
       return plannings;
     } catch (e) {
-      return null;
+      return [];
     }
   }
 
