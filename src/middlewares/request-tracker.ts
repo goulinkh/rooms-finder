@@ -5,7 +5,11 @@ import { Logger } from "src/services/logger";
 const requestTracker: (logger: Logger) => express.Handler = function (logger) {
   return (req, _res, next) => {
     Object.assign(req, { id: uuid() });
-    logger.log(`${(req as any).id} ${req.ip} ${req.url}`, "Request");
+    logger.log(
+      // @ts-ignore
+      `${(req as any).id} ${req["X-Real-IP"] || req.ip} ${req.url}`,
+      "Request"
+    );
     next();
   };
 };
