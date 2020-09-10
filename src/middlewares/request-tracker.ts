@@ -7,7 +7,7 @@ const requestTracker: (logger: Logger) => express.Handler = function (logger) {
     Object.assign(req, { id: uuid() });
     logger.log(
       // @ts-ignore
-      `${(req as any).id} ${req["X-Real-IP"] || req.ip} ${req.url}`,
+      `${(req as any).id} ${req["x-forwarded-for"] || req.ip} ${req.url}`,
       "Request"
     );
     next();

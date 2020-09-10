@@ -55,7 +55,6 @@ export class PlanningService {
           ))
         );
       } catch (e) {
-        console.log("e", e);
         this.logger.error(
           `failed to fetch data from ${start} to ${end}`,
           "PlanningsService"
@@ -150,8 +149,13 @@ export class PlanningService {
   // TODO: doc start & end date(format)
   private getMonths(start: string, end: string) {
     const months = [];
-    for (var m = moment(start); m.isBefore(end); m.add(1, "months")) {
-      months.push(m.format("YYYY-MM-DD"));
+    const format = "YYYY-MM-DD";
+    for (
+      let m = moment(start, format);
+      m.isBefore(moment(end, format));
+      m.add(1, "months")
+    ) {
+      months.push(m.format(format));
     }
     return months;
   }

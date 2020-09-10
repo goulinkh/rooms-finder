@@ -3,14 +3,22 @@ import buildings from "../assets/buildings.json";
 import { Room, IRoom } from "../models/room";
 import fetch from "node-fetch";
 
+interface EDTRoom {
+  id: string;
+  text: string;
+  dept: string;
+}
+
 export class RoomsService {
   constructor(private logger: Logger) {}
 
   async updateRooms() {
     this.logger.log(`Updating rooms list...`, "RoomsService");
     try {
-      let rooms = await this.getAllRooms();
-      rooms = rooms.map((r) => this.recognizeRoom(r)).filter((r) => r.building);
+      const allRooms = await this.getAllRooms();
+      const rooms = allRooms
+        .map((r) => this.recognizeRoom(r))
+        .filter((r) => r.building);
       // Update the db
       await Room.deleteMany({});
       for (let i = 0; i < rooms.length; i++) {
@@ -32,7 +40,7 @@ export class RoomsService {
     }
   }
 
-  private recognizeRoom(room: any) {
+  private recognizeRoom(room: EDTRoom) {
     const guesses = buildings.filter((b) => {
       if (b.match(new RegExp(`salles\\s.*`, "gi"))) {
         b = b.replace(new RegExp(`salles\\s`, "gi"), "");
@@ -47,7 +55,7 @@ export class RoomsService {
     };
   }
 
-  private async getAllRooms() {
+  private async getAllRooms(): Promise<EDTRoom[]> {
     const rooms = [];
     const globalQuery = "fsi ";
     let rep = await this.getRooms(globalQuery, 1);
@@ -94,12 +102,14 @@ export class RoomsService {
 
   async getRoomsByBuilding(building: string) {
     try {
-      return (await Room.find({ building: building.toUpperCase() })).map(
-        (e: IRoom) => ({
-          name: e.name,
-          building: e.building,
+      return (
+        await Room.find({
+          building: { $regex: new RegExp(`^${building}$`, "gi") },
         })
-      );
+      ).map((e: IRoom) => ({
+        name: e.name,
+        building: e.building,
+      }));
     } catch (e) {
       return [];
     }

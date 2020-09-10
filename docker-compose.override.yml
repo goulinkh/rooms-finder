@@ -12,7 +12,7 @@ services:
       - 2002:8080
     depends_on:
       - mongodb
-    env_file: 
+    env_file:
       - .env
   mongodb:
     image: mongo
@@ -20,7 +20,7 @@ services:
     restart: always
     volumes:
       - db-data:/data/db
-    ports:
-      - "27017-27019:27017-27019"
+    # ports:
+    #   - "27017-27019:27017-27019"
 volumes:
   db-data:
