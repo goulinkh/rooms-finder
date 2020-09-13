@@ -91,6 +91,9 @@ export class RoomsService {
         $options: "i",
       },
     });
+     if (!rooms.length) {
+      rooms = await Room.find({ building: new RegExp(query, "i")});
+    }
     if (!rooms.length) {
       rooms = await Room.find({ slug: query });
     }
