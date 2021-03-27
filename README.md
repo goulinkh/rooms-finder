@@ -2,7 +2,7 @@
 
 ---
 
-A [RESTFul API](https://rooms-finder.goulin.fr/doc) with [a basic frontend](https://rooms-finder.goulin.fr) that helps the students of the students of University Paul Sabatier to easily find free amphitheaters and class rooms :
+A [RESTFul API](https://rooms-finder.goulin.fr/doc) with [a basic frontend](https://rooms-finder.goulin.fr) that helps the students of the University Paul Sabatier to easily find free amphitheaters and class rooms :
 
 <p align="center"><img src="/resources/img/demo.gif" alt="rooms-finder"/></p>
 
