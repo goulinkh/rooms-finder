@@ -45,8 +45,24 @@ export class Server {
       baseRoute: "/",
       name: "PlanningsController",
     });
+    this.app.use(this.errorsHandler);
   }
-
+  private errorsHandler(
+    err: Error,
+    _req: express.Request,
+    res: express.Response,
+    _next: Function
+  ) {
+    if (err && !res.headersSent) {
+      if (err.message && err.message.match(/^\[custom\]/gi)) {
+        res
+          .status(404)
+          .json({ message: err.message.replace(/^\[custom\]/gi, "") });
+      } else {
+        res.status(404).send({ message: "Requête invalide" });
+      }
+    }
+  }
   private applyController({
     baseRoute = "",
     controller,
