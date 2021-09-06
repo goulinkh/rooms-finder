@@ -21,6 +21,7 @@ const config = {
     port: Number(accessEnv("PORT", "8080")),
     db: accessEnv("DB", "mongodb://mongodb:27017/room-finder"),
     log: Boolean(accessEnv("LOG", "true")),
+    redisPassword: accessEnv("REDIS_PASSWORD"),
   },
   planning: {
     start: accessEnv("PLANNING_START", "2019-09-01"),
