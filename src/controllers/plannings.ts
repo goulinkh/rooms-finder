@@ -1,7 +1,7 @@
-import { RoomsService } from "src/services/rooms";
-import { Controller, Handler, Route } from "./controller.interface";
 import { PlanningService } from "src/services/planning";
+import { RoomsService } from "src/services/rooms";
 import buildings from "../assets/buildings.json";
+import { Controller, Handler, Route } from "./controller.interface";
 
 export class PlanningsController implements Controller {
   routes: Route[];
@@ -34,7 +34,7 @@ export class PlanningsController implements Controller {
         building: rooms[i].building,
         freeSchedules,
       }));
-      res.json(plannings);
+      res.jsonc(plannings);
     } catch (e) {
       next(e);
     }
@@ -42,7 +42,7 @@ export class PlanningsController implements Controller {
 
   private getAllBuildings: Handler = async (_req, res, next) => {
     try {
-      res.json(buildings.map((b) => ({ name: b })));
+      res.jsonc(buildings.map((b) => ({ name: b })));
     } catch (e) {
       next(e);
     }
@@ -52,7 +52,7 @@ export class PlanningsController implements Controller {
     try {
       let building = req.params.building as string;
       if (!building) building = req.query.building as string;
-      res.json(await this.roomsService.getRoomsByBuilding(building));
+      res.jsonc(await this.roomsService.getRoomsByBuilding(building));
     } catch (e) {
       next(e);
     }

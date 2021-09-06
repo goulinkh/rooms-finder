@@ -6,7 +6,9 @@ import config from "./config";
 import { Controller } from "./controllers/controller.interface";
 import { PingsController } from "./controllers/pings";
 import { PlanningsController } from "./controllers/plannings";
+import cache from "./middlewares/cache";
 import requestTracker from "./middlewares/request-tracker";
+import { CacheManager } from "./services/cache";
 import { Logger } from "./services/logger";
 import { PlanningService } from "./services/planning";
 import { RoomsService } from "./services/rooms";
@@ -19,6 +21,7 @@ export class Server {
   middlewares: express.Handler[];
   constructor(
     private logger: Logger,
+    private cacheManager: CacheManager,
     private roomsService: RoomsService,
     private planningService: PlanningService
   ) {
@@ -27,26 +30,35 @@ export class Server {
   }
 
   async initialize() {
-    this.middlewares = [helmet(), cors(), requestTracker(this.logger)];
+    this.middlewares = [
+      helmet(),
+      cors(),
+      requestTracker(this.logger),
+      cache(this.logger, this.cacheManager),
+    ];
+
+    this.app.use(...this.middlewares);
 
     const pingsController = new PingsController();
-    const planningsController = new PlanningsController(
-      this.roomsService,
-      this.planningService
-    );
-    this.app.use(...this.middlewares);
     this.applyController({
       controller: pingsController,
       baseRoute: "/",
       name: "PingsController",
     });
+
+    const planningsController = new PlanningsController(
+      this.roomsService,
+      this.planningService
+    );
     this.applyController({
       controller: planningsController,
       baseRoute: "/",
       name: "PlanningsController",
     });
+
     this.app.use(this.errorsHandler);
   }
+
   private errorsHandler(
     err: Error,
     _req: express.Request,
@@ -63,6 +75,7 @@ export class Server {
       }
     }
   }
+
   private applyController({
     baseRoute = "",
     controller,

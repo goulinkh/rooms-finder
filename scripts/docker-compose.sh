@@ -6,8 +6,8 @@ if [ -z "$ENV"]; then
 fi
 
 if [ "$ENV" == "prod" ]; then
-  docker-compose -f docker-compose.override.yml -f docker-compose.prod.yml "$@"
+  docker-compose -f docker-compose.override.yml -f docker-compose.prod.yml --env-file=.env "$@"
 else
   # default: dev
-  docker-compose "$@"
+  docker-compose --env-file=.env "$@"
 fi

@@ -12,6 +12,7 @@ services:
       - 2002:8080
     depends_on:
       - mongodb
+      - cache
     env_file:
       - .env
   mongodb:
@@ -22,5 +23,14 @@ services:
       - db-data:/data/db
     # ports:
     #   - "27017-27019:27017-27019"
+  cache:
+    image: redis:6-alpine
+    container_name: rooms-finder.cache
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - cache-data:/data
+
 volumes:
   db-data:
+  cache-data:
