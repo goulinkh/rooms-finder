@@ -2,6 +2,7 @@ import { Logger } from "./logger";
 import buildings from "../assets/buildings.json";
 import { Room, IRoom } from "../models/room";
 import fetch from "node-fetch";
+import { Document } from "mongoose";
 
 interface EDTRoom {
   id: string;
@@ -19,6 +20,8 @@ export class RoomsService {
       const rooms = allRooms
         .map((r) => this.recognizeRoom(r))
         .filter((r) => r.building);
+
+      if (!rooms.length) return;
       // Update the db
       await Room.deleteMany({});
       for (let i = 0; i < rooms.length; i++) {
@@ -59,31 +62,38 @@ export class RoomsService {
     const rooms = [];
     const globalQuery = "fsi ";
     let rep = await this.getRooms(globalQuery, 1);
-    rooms.push(...rep.results);
+    rooms.push(...(rep ?? []));
     let i = 2;
-    while (rep.total && rep.total > 100 && rep.results && rep.results.length) {
+    while (rep?.length ?? 0 > 100) {
       // There is more
       rep = await this.getRooms(globalQuery, i);
-      rooms.push(...rep.results);
+      rooms.push(...(rep ?? []));
       ++i;
     }
     return rooms;
   }
 
-  private async getRooms(query: string, pageNumber: number) {
+  private async getRooms(
+    query: string,
+    pageNumber: number
+  ): Promise<EDTRoom[] | null> {
     try {
       const room = await (
         await fetch(
           `https://edt.univ-tlse3.fr/calendar2/Home/ReadResourceListItems?myResources=false&searchTerm=${query}&pageSize=100&pageNumber=${pageNumber}&resType=102`
         )
       ).json();
-      return room;
+      return room.results;
     } catch (e) {
       return null;
     }
   }
 
   async searchRooms(query: string) {
+    type Room = Document<any, any, any> & IRoom;
+    const findByName = (rooms: Room[], room: Room) =>
+      rooms.find((r) => r.name === room.name);
+
     let rooms = await Room.find({
       // (FSI / )(Amphi) query (...etc)
       name: {
@@ -91,16 +101,26 @@ export class RoomsService {
         $options: "i",
       },
     });
-     if (!rooms.length) {
-      rooms = await Room.find({ building: new RegExp(query, "i")});
-    }
-    if (!rooms.length) {
-      rooms = await Room.find({ slug: query });
-    }
-    if (!rooms.length) {
-      rooms = await Room.find({ name: query });
-    }
-    return rooms;
+
+    (await Room.find({ building: new RegExp(query, "i") })).forEach((room) => {
+      if (!findByName(rooms, room)) rooms.push(room);
+    });
+    (await Room.find({ slug: query })).forEach((room) => {
+      if (!findByName(rooms, room)) rooms.push(room);
+    });
+    (await Room.find({ name: query })).forEach((room) => {
+      if (!findByName(rooms, room)) rooms.push(room);
+    });
+
+    return rooms.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      }
+      if (a.name > b.name) {
+        return 1;
+      }
+      return 0;
+    });
   }
 
   async getRoomsByBuilding(building: string) {
