@@ -2,7 +2,7 @@
   "name": "rooms_finder",
   "version": "3.0.0",
   "author": "Goulin Khoge",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "description": "Find free class rooms in the University of Toulouse 3",
   "main": "src/index.ts",
   "scripts": {
